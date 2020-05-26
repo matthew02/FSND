@@ -1,17 +1,23 @@
+#!/usr/bin/env python3
+
 #----------------------------------------------------------------------------#
 # Imports
 #----------------------------------------------------------------------------#
 
-import json
-import dateutil.parser
 import babel
-from flask import Flask, render_template, request, Response, flash, redirect, url_for
+import dateutil.parser
+import json
+import logging
+
+from flask import flash, Flask, redirect, render_template, request, Response, url_for
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
-import logging
-from logging import Formatter, FileHandler
 from flask_wtf import Form
+from logging import Formatter, FileHandler
+
 from forms import *
+
+
 #----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
@@ -22,6 +28,7 @@ app.config.from_object('config')
 db = SQLAlchemy(app)
 
 # TODO: connect to a local postgresql database
+
 
 #----------------------------------------------------------------------------#
 # Models.
@@ -41,6 +48,7 @@ class Venue(db.Model):
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
+
 class Artist(db.Model):
     __tablename__ = 'Artist'
 
@@ -57,6 +65,8 @@ class Artist(db.Model):
 
 # TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
 
+
+db.create_all()
 #----------------------------------------------------------------------------#
 # Filters.
 #----------------------------------------------------------------------------#
@@ -70,6 +80,7 @@ def format_datetime(value, format='medium'):
   return babel.dates.format_datetime(date, format)
 
 app.jinja_env.filters['datetime'] = format_datetime
+
 
 #----------------------------------------------------------------------------#
 # Controllers.

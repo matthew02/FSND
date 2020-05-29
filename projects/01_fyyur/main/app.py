@@ -148,30 +148,46 @@ def index():
 
 @app.route('/venues')
 def venues():
-    # TODO: replace with real venues data.
-    #       num_shows should be aggregated based on number of upcoming shows per venue.
-    data=[{
-        "city": "San Francisco",
-        "state": "CA",
-        "venues": [{
-            "id": 1,
-            "name": "The Musical Hop",
-            "num_upcoming_shows": 0,
-        }, {
-            "id": 3,
-            "name": "Park Square Live Music & Coffee",
-            "num_upcoming_shows": 1,
-        }]
-    }, {
-        "city": "New York",
-        "state": "NY",
-        "venues": [{
-            "id": 2,
-            "name": "The Dueling Pianos Bar",
-            "num_upcoming_shows": 0,
-        }]
-    }]
-    return render_template('pages/venues.html', areas=data);
+    ## TODO: replace with real venues data.
+    ##       num_shows should be aggregated based on number of upcoming shows per venue.
+    #data=[{
+    #    "city": "San Francisco",
+    #    "state": "CA",
+    #    "venues": [{
+    #        "id": 1,
+    #        "name": "The Musical Hop",
+    #        "num_upcoming_shows": 0,
+    #    }, {
+    #        "id": 3,
+    #        "name": "Park Square Live Music & Coffee",
+    #        "num_upcoming_shows": 1,
+    #    }]
+    #}, {
+    #    "city": "New York",
+    #    "state": "NY",
+    #    "venues": [{
+    #        "id": 2,
+    #        "name": "The Dueling Pianos Bar",
+    #        "num_upcoming_shows": 0,
+    #    }]
+    #}]
+    venues = Venue.query.all()
+    locations = set((venue.city, venue.state) for venue in venues)
+    areas = [
+        {
+            'city': location[0],
+            'state': location[1],
+            'venues': Venue.query
+                           .filter(Venue.city == location[0])
+                           .filter(Venue.state == location[1])
+                           .order_by('state')
+                           .order_by('city')
+                           .all()
+        }
+        for location
+        in locations
+    ]
+    return render_template('pages/venues.html', areas=areas);
 
 @app.route('/venues/search', methods=['POST'])
 def search_venues():

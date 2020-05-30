@@ -139,3 +139,4 @@ fabric.properties
 .env
 uwsgi.ini
 .venv
+Pipfile.lock

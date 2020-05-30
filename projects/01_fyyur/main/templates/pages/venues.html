@@ -6,6 +6,7 @@
 	<ul class="items">
 		{% for venue in area.venues %}
 		<li>
+      <button class="delete-button" data-id="{{ venue.id }}">&cross;</button>
 			<a href="/venues/{{ venue.id }}">
 				<i class="fas fa-music"></i>
 				<div class="item">
@@ -16,4 +17,19 @@
 		{% endfor %}
 	</ul>
 {% endfor %}
+<script>
+  function DeleteButtonClicked(button) {
+    button.onclick = event => {
+      console.log('delete button click event', event);
+      console.log('delete button id', event.target.dataset.id);
+      const venueId = event.target.dataset.id;
+      fetch('/venues/' + venueId, {
+        method: 'DELETE',
+      })
+      .then(() => window.location = '/')
+    }
+  }
+  const delete_buttons = document.querySelectorAll('.delete-button');
+  delete_buttons.forEach(DeleteButtonClicked)
+</script>
 {% endblock %}

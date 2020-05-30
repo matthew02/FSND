@@ -4,6 +4,7 @@
 <ul class="items">
 	{% for artist in artists %}
 	<li>
+    <button class="delete-button" bata-id="{{ artist.id }}">&cross;</button>
 		<a href="/artists/{{ artist.id }}">
 			<i class="fas fa-users"></i>
 			<div class="item">

@@ -73,7 +73,12 @@ class Venue(db.Model, Model):
     facebook_link = db.Column(db.String(120))
     seeking_talent = db.Column(db.Boolean, nullable=False)
     seeking_description = db.Column(db.String)
-    shows = db.relationship('Show', backref='venue', lazy=True)
+    shows = db.relationship(
+        'Show',
+        backref='venue',
+        cascade='all, delete',
+        lazy=True,
+    )
 
     def __repr__(self):
         return f'<Venue {self.id} {self.name}>'
@@ -93,7 +98,12 @@ class Artist(db.Model, Model):
     facebook_link = db.Column(db.String(120))
     seeking_venue = db.Column(db.Boolean, nullable=False)
     seeking_description = db.Column(db.String)
-    shows = db.relationship('Show', backref='artist', lazy=True)
+    shows = db.relationship(
+        'Show',
+        backref='artist',
+        cascade='all, delete',
+        lazy=True,
+    )
 
     def __repr__(self):
         return f'<Artist {self.id} {self.name}>'
@@ -106,12 +116,12 @@ class Show(db.Model, Model):
     start_time = db.Column(db.DateTime)
     venue_id = db.Column(
         db.Integer,
-        db.ForeignKey('venue.id'),
+        db.ForeignKey('venue.id', ondelete='cascade'),
         nullable=False
     )
     artist_id = db.Column(
         db.Integer,
-        db.ForeignKey('artist.id'),
+        db.ForeignKey('artist.id', ondelete='cascade'),
         nullable=False
     )
 
@@ -263,9 +273,12 @@ def search_artists():
 
 @app.route('/artists/<int:artist_id>')
 def show_artist(artist_id):
+    artist = Artist.query.get(artist_id)
+    current_time = datetime.now()
+    print(f'artist.shows is {artist.shows}')
     return render_template(
         'pages/show_artist.html',
-        artist=Artist.query.get(artist_id)
+        artist=artist
     )
 
 #  Update
@@ -359,6 +372,29 @@ def create_artist_submission():
         flash(f'Artist {request.form["name"]} was successfully listed!')
 
     return render_template('pages/home.html')
+
+@app.route('/artists/<artist_id>', methods=['DELETE'])
+def delete_artist(artist_id):
+    error = False
+
+    try:
+        artist = Artist.query.get(artist_id)
+        artist.delete()
+    except Exception as e:
+        error = True
+        print(f'Exception ==> {e}')
+        db.session.rollback()
+    finally:
+        db.session.close()
+
+    if error:
+        flash(f'An error occurred.'
+              f'Artist {artist_id} could not be deleted.',
+              'error')
+    else:
+        flash(f'Artist {artist_id} was successfully deleted.')
+
+    return redirect(url_for('index'))
 
 
 #  Shows
